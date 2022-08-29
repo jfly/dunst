@@ -222,7 +222,8 @@ char *get_path_from_icon_name(const char *iconname, int size)
         if (STR_EMPTY(iconname))
                 return NULL;
 
-        const char *suffixes[] = { ".svg", ".svgz", ".png", ".xpm", NULL };
+        const char *suffixes_1[] = { "", "-symbolic", NULL };
+        const char *suffixes_2[] = { ".svg", ".svgz", ".png", ".xpm", NULL };
         gchar *uri_path = NULL;
         char *new_name = NULL;
 
@@ -245,15 +246,19 @@ char *get_path_from_icon_name(const char *iconname, int size)
 
                         current_folder = g_strndup(start, end - start);
 
-                        for (const char **suf = suffixes; *suf; suf++) {
-                                gchar *name_with_extension = g_strconcat(iconname, *suf, NULL);
-                                maybe_icon_path = g_build_filename(current_folder, name_with_extension, NULL);
-                                if (is_readable_file(maybe_icon_path)) {
-                                        new_name = g_strdup(maybe_icon_path);
-                                }
-                                g_free(name_with_extension);
-                                g_free(maybe_icon_path);
+                        for (const char **suf_1 = suffixes_1; *suf_1; suf_1++) {
+                                for (const char **suf_2 = suffixes_2; *suf_2; suf_2++) {
+                                        gchar *name_with_extension = g_strconcat(iconname, *suf_1, *suf_2, NULL);
+                                        maybe_icon_path = g_build_filename(current_folder, name_with_extension, NULL);
+                                        if (is_readable_file(maybe_icon_path)) {
+                                                new_name = g_strdup(maybe_icon_path);
+                                        }
+                                        g_free(name_with_extension);
+                                        g_free(maybe_icon_path);
 
+                                        if (new_name)
+                                                break;
+                                }
                                 if (new_name)
                                         break;
                         }

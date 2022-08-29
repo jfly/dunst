@@ -264,18 +264,21 @@ char *find_icon_in_theme(const char *name, int theme_index, int size) {
                                 break;
                 }
                 if (match_size) {
-                        const char *suffixes[] = { ".svg", ".svgz", ".png", ".xpm", NULL };
-                        for (const char **suf = suffixes; *suf; suf++) {
-                                char *name_with_extension = g_strconcat(name, *suf, NULL);
-                                char *icon = g_build_filename(theme->location, theme->subdir_theme,
-                                                dir.name, name_with_extension,
-                                                NULL);
-                                if (is_readable_file(icon)) {
+                        const char *suffixes_1[] = { "", "-symbolic", NULL };
+                        const char *suffixes_2[] = { ".svg", ".svgz", ".png", ".xpm", NULL };
+                        for (const char **suf_1 = suffixes_1; *suf_1; suf_1++) {
+                                for (const char **suf_2 = suffixes_2; *suf_2; suf_2++) {
+                                        char *name_with_extension = g_strconcat(name, *suf_1, *suf_2, NULL);
+                                        char *icon = g_build_filename(theme->location, theme->subdir_theme,
+                                                    dir.name, name_with_extension,
+                                                    NULL);
+                                        if (is_readable_file(icon)) {
+                                                g_free(name_with_extension);
+                                                return icon;
+                                        }
                                         g_free(name_with_extension);
-                                        return icon;
+                                        g_free(icon);
                                 }
-                                g_free(name_with_extension);
-                                g_free(icon);
                         }
                 }
         }
